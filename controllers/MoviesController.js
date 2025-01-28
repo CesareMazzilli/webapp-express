@@ -32,20 +32,27 @@ const index = (req, res, next) => {
 };
 
 const show = (req, res, next) => {
-    const id = req.params.id;
-    const sql = `SELECT * FROM movies WHERE id = ?`;
-    const reviewsSql = `SELECT * FROM reviews WHERE movie_id = ?`;
+    const slug = req.params.slug;
+    console.log(slug);
+    
+    const sql = `SELECT * FROM movies WHERE slug = ?`;//prima query
+    const reviewsSql = `
+    SELECT reviews.* 
+    FROM reviews
+    JOIN movies
+    ON movies.id = reviews.movie_id
+    WHERE movies.slug = ?`;//seconda query
 
-    connection.query(sql, [id], (err, movies) => {
+    connection.query(sql, [slug], (err, movies) => {
         if (err) {
             return next(new Error(err.message))
         };
         if (movies.length === 0) {
             return res.status(404).json({
-                message: "Dipartimento non trovato"
+                message: "film non trovato"
             })
         } else {
-            connection.query(reviewsSql, [id], (err, reviews) => {
+            connection.query(reviewsSql, [slug], (err, reviews) => {
                 if (err) {
                     return next(new Error(err.message))
                 };
