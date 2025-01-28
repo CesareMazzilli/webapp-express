@@ -9,6 +9,8 @@ const port = process.env.SERVER_PORT;
 
 app.use(express.static("public"));
 
+app.use(express.json()); 
+
 app.use(cors({
     origin: process.env.FRONTEND_URL
 }));
