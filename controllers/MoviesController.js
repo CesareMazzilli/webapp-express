@@ -73,7 +73,7 @@ const show = (req, res, next) => {
 const storeReview = (req, res, next) => {
     const movieId = req.params.id;
     const { name, vote, text } = req.body;
-    
+
     if (isNaN(vote) || vote < 0 || vote > 5) {
         return res.status(400).json({
             status: "fail",
@@ -131,10 +131,38 @@ const storeReview = (req, res, next) => {
     });
 
 
-}
+};
+const store = (req, res, next) => {
+   
+    const imageName = req.file.filename;
+    const { title, author, genre, abstract } = req.body;
+    const slug = slugify(title, {
+        lower: true,
+        strict: true,
+    });
+
+    const sql = `
+      INSERT INTO books(slug, title, director, genre, release_year, abstract, image)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+    `;
+
+    connection.query(sql, [slug, title, author, genre, release_year, abstract, imageName], (err, results) => {
+        if (err) {
+            next(new Error(err.message));
+        }
+
+        return res.status(201).json({
+            status: "success",
+            message: "Il film è stato salvato",
+        });
+    })
+
+
+};
 
 module.exports = {
     index,
     show,
-    storeReview
+    storeReview,
+    store
 };
